@@ -1,7 +1,9 @@
 
 # ✅ NanoEdgeAI Embedded Anomaly Detection (STM32 Standalone)
 
-> **Note:** This demo highlights the complete NanoEdge AI Studio workflow—from model generation to embedded inference—using synthetic input data in place of physical sensors. The anomaly detection logic is streamlined to showcase firmware integration and runtime evaluation, and may yield varied results due to the nature of the test inputs. For more realistic detection performance, STMicroelectronics recommends developing with their **B-U585I-IOT02A Discovery Kit**, which provides ready-to-use onboard sensors fully compatible with NanoEdge AI Studio.
+> **Note**: This demo illustrates the full NanoEdge AI Studio pipeline—from model generation to embedded inference—using synthetic input data in place of live sensor readings. It is validated specifically on the STM32H743ZI Nucleo-144 board using the NanoEdge library generated for this hardware. The anomaly detection logic is designed to showcase firmware-level integration and runtime evaluation, and results may vary due to the nature of test inputs.
+For real-world performance or sensor-based deployments, STMicroelectronics recommends their B-U585I-IOT02A Discovery Kit, which features onboard sensors and full NanoEdge compatibility.
+
 
 ---
 
