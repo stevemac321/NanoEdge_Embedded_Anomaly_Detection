@@ -1,7 +1,7 @@
 
 # ✅ NanoEdgeAI Embedded Anomaly Detection (STM32 Standalone)
 
-> **Note**: This demo illustrates the full NanoEdge AI Studio pipeline—from model generation to embedded inference—using synthetic input data in place of live sensor readings. It is validated specifically on the STM32H743ZI Nucleo-144 board using the NanoEdge library generated for this hardware. The anomaly detection logic is designed to showcase firmware-level integration and runtime evaluation, and results may vary due to the nature of test inputs.
+> **Note**: This demo illustrates the full NanoEdge AI Studio pipeline—from model generation to embedded inference—using synthetic input data in place of live sensor readings. It is validated specifically on the STM32H743Z Nucleo-144 board using the NanoEdge library generated for this hardware. The anomaly detection logic is designed to showcase firmware-level integration and runtime evaluation, and results may vary due to the nature of test inputs.
 For real-world performance or sensor-based deployments, STMicroelectronics recommends their B-U585I-IOT02A Discovery Kit, which features onboard sensors and full NanoEdge compatibility.
 
 
@@ -74,21 +74,8 @@ Due to upload limitations on some platforms, the following files have been renam
 - `_mxproject` → rename to `.mxproject`  
 - `_project` → rename to `.project`
 
-**To restore full STM32CubeIDE functionality, simply rename these files after cloning or downloading the repository.**
+**To restore full STM32CubeIDE functionality, simply rename these files after cloning or downloading the repository.   NanoEdge AI Studio does support other boards, however this project has only been validated on the STM32H743Z. **
 
 ---
-
-## 🧰 Board Compatibility
-
-This demo is designed specifically for the **STM32H723ZG Nucleo board**. If you're working with a different STM32 variant, you may still be able to use this workflow by:
-
-- Creating a new STM32CubeIDE project targeting your board
-- Porting over the following:
-  - `Core/Src/main.c`
-  - All contents of `Core/Inc/`
-  - `Core/lib/` (including `libneai.a`)
-- Adding include paths and library references in project properties
-
-🎥 A step-by-step YouTube guide will be published soon to walk through this process visually.
 
 License: GPL v.2
