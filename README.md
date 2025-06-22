@@ -1,5 +1,5 @@
 
-# ✅ NanoEdgeAI EKG Anomaly Detection (STM32 Standalone)
+# ✅ NanoEdgeAI Embedded Anomaly Detection (STM32 Standalone)
 
 > **Note:** This demo highlights the complete NanoEdge AI Studio workflow—from model generation to embedded inference—using synthetic input data in place of physical sensors. The anomaly detection logic is streamlined to showcase firmware integration and runtime evaluation, and may yield varied results due to the nature of the test inputs. For more realistic detection performance, STMicroelectronics recommends developing with their **B-U585I-IOT02A Discovery Kit**, which provides ready-to-use onboard sensors fully compatible with NanoEdge AI Studio.
 
