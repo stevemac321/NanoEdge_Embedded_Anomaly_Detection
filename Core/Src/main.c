@@ -25,6 +25,9 @@
 #include "knowledge.h"
 #include "stdio.h"
 #include "string.h"
+#include "stdbool.h"
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,6 +42,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+#define RX_LEN 560
+#define FLOAT_SIZE 4
 
 /* USER CODE END PM */
 
@@ -47,8 +52,13 @@
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-extern float normal_data[20][140];
-extern float anomaly_data[20][140];
+
+extern float normal_data[DATA_ROWS][DATA_INPUT_USER];
+extern float anomaly_data[DATA_ROWS][DATA_INPUT_USER];
+
+uint8_t rx_buffer[RX_LEN];
+float inf_buffer[DATA_INPUT_USER];
+static volatile uint8_t float_offset=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,7 +67,9 @@ static void MPU_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-enum neai_state train_model();
+
+void inferrence();
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -99,51 +111,28 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  // Flush the RX buffer by reading until it's empty
-  uint8_t dummy;
-  while (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_RXNE)) {
-      HAL_UART_Receive(&huart3, &dummy, 1, HAL_MAX_DELAY);
-  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   enum neai_state status = neai_anomalydetection_init();
-  status = neai_anomalydetection_knowledge(knowledge);
-  HAL_UART_Abort_IT(&huart3);
-  __HAL_UART_DISABLE_IT(&huart3, UART_IT_RXNE);
-  printf("test\r\n");
-
-  uint8_t lowest_normal = 100;
-  uint8_t highest_anomaly = 0;
-
-  for (int i = 0; i < DATA_ROWS; i++) {
-      uint8_t normal_similarity = 0;
-      enum neai_state normal_status = neai_anomalydetection_detect(normal_data[i], &normal_similarity);
-
-      uint8_t anomaly_similarity = 0;
-      enum neai_state anomaly_status = neai_anomalydetection_detect(anomaly_data[i], &anomaly_similarity);
-
-      if (normal_status == NEAI_OK && normal_similarity < lowest_normal) {
-          lowest_normal = normal_similarity;
-      }
-
-      if (anomaly_status == NEAI_OK && anomaly_similarity > highest_anomaly) {
-          highest_anomaly = anomaly_similarity;
-      }
-
-      printf("normal similarity = %d, neai_state = %d --- anomaly similarity = %d, neai_state = %d\r\n",
-             normal_similarity, normal_status, anomaly_similarity, anomaly_status);
+  if(status != NEAI_OK) {
+	  printf("neai_anomalydetection_init failed %d\r\n", status);
+	  return 0;
   }
 
-  printf("Lowest normal similarity: %d\r\n", lowest_normal);
-  printf("Highest anomaly similarity: %d\r\n", highest_anomaly);
-
-
+  status = neai_anomalydetection_knowledge(knowledge);
+  if(status != NEAI_OK) {
+  	  printf("neai_anomalydetection_knowledge failed %d\r\n", status);
+  	  return 0;
+  }
+  //HAL_UART_Receive_IT(&huart3, rx_buffer, RX_LEN);
+  HAL_UARTEx_ReceiveToIdle_IT(&huart3, rx_buffer, RX_LEN);
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  //inferrence();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -312,75 +301,62 @@ int _write(int file, char *ptr, int len) {
     HAL_UART_Transmit(&huart3, (uint8_t*)ptr, len, HAL_MAX_DELAY);
     return len;
 }
-enum neai_state train_model()
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
-    // Initialize NanoEdge AI
-    enum neai_state status = neai_anomalydetection_init();
+    if (huart->Instance == USART3)
+    {
+        uint16_t floats_received = Size / FLOAT_SIZE;
 
-    if (status != NEAI_OK) {
-        printf("NanoEdge AI init failed with errcode %d!\r\n", status);
-        return status;
-    }
-
-    // Train
-    for (int x = 0; x < (MINIMUM_ITERATION_CALLS_FOR_EFFICIENT_LEARNING * 100); x++) {
-        for (size_t i = 0; i < 10; ++i) {
-            status = neai_anomalydetection_learn(normal_data[i]);
-
-            if (status == NEAI_MINIMAL_RECOMMENDED_LEARNING_DONE) {
-                printf("Training complete at outer iteration %d, record %d\r\n", x, i);
-                return status;
-            }
-
-            if (status != NEAI_OK && status != NEAI_NOT_ENOUGH_CALL_TO_LEARNING) {
-                printf("Training failed at outer iteration %d, record %d with errcode %d\r\n", x, i, status);
-                return status;  // fatal error
-            }
-
+        for (uint16_t i = 0; i < floats_received && float_offset < DATA_INPUT_USER; ++i)
+        {
+            memcpy(&inf_buffer[float_offset], &rx_buffer[i * FLOAT_SIZE], FLOAT_SIZE);
+            float_offset++;
         }
+
+        if (float_offset == DATA_INPUT_USER)
+        {
+            uint8_t similarity = 0;
+            enum neai_state status = neai_anomalydetection_detect(inf_buffer, &similarity);
+            printf("similarity = %d, status = %d\r\n", similarity, status);
+
+            float_offset = 0;
+            memset(inf_buffer, 0, sizeof(inf_buffer));
+        }
+
+        HAL_UARTEx_ReceiveToIdle_IT(&huart3, rx_buffer, RX_LEN);  // Re-arm
     }
-
-    // If we finish all loops without hitting "learning done"
-    printf("Training did not reach recommended threshold. Last status: %d\r\n", status);
-    return status;
 }
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+
+void inferrence()
 {
-#if 0
-	 if (huart->Instance == USART3)
-	    {
-	        float value;
-	        memcpy(&value, rx_chunk, sizeof(float));   // Safely convert 4 bytes to float
-	        memset(rx_chunk, 0, sizeof(rx_chunk));
+	uint8_t lowest_normal = 100;
+	  uint8_t highest_anomaly = 0;
 
-	        EKG_Input[ekg_index++] = value;            // Store into input array
+	  for (int i = 0; i < DATA_ROWS; i++) {
+	      uint8_t normal_similarity = 0;
+	      enum neai_state normal_status = neai_anomalydetection_detect(normal_data[i], &normal_similarity);
 
-	        if (ekg_index >= DATA_INPUT_USER)
-	        {
-	            // All 141 floats received — call the model
-	            uint8_t similarity = 0;
-	            enum neai_state status = neai_anomalydetection_detect(EKG_Input, &similarity);
+	      uint8_t anomaly_similarity = 0;
+	      enum neai_state anomaly_status = neai_anomalydetection_detect(anomaly_data[i], &anomaly_similarity);
 
-	            // Send status and similarity back
-	            uint8_t report[2] = { (uint8_t)status, similarity };
-	            HAL_UART_Transmit(&huart3, report, sizeof(report), HAL_MAX_DELAY);
+	      if (normal_status == NEAI_OK && normal_similarity < lowest_normal) {
+	          lowest_normal = normal_similarity;
+	      }
 
-	            // Reset index for next signal
-	            ekg_index = 0;
-	        }
+	      if (anomaly_status == NEAI_OK && anomaly_similarity > highest_anomaly) {
+	          highest_anomaly = anomaly_similarity;
+	      }
 
-	        // Request the next 4 bytes (one float)
-	        HAL_UART_Receive_IT(huart, rx_chunk, sizeof(rx_chunk));
-	    }
-#endif
+	      printf("normal similarity = %d, neai_state = %d --- anomaly similarity = %d, neai_state = %d\r\n",
+	             normal_similarity, normal_status, anomaly_similarity, anomaly_status);
+	  }
 
+	  printf("Lowest normal similarity: %d\r\n", lowest_normal);
+	  printf("Highest anomaly similarity: %d\r\n", highest_anomaly);
 }
-
 
 
 /* -----------------------------------------------------------------------------*/
-
-
 
 
 /* USER CODE END 4 */
