@@ -89,7 +89,7 @@ To get started:
 - Launch widget.py with the required modules (PySide6, pyserial, etc.).
 - Flash the STM32 with the provided firmware.
 - Connect and test.
-  Compressed project archive: NanoEdge_with_Client.zip (no build artifacts included)
+  Compressed project archive: NanoEdge_Client.zip (no build artifacts included)
 
 
 
