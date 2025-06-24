@@ -92,5 +92,35 @@ To get started:
   Compressed project archive: NanoEdge_Client.zip (no build artifacts included)
 
 
+---
+
+## 🧭 Deployment Modes
+
+This project supports two complementary modes of operation:
+
+### 1. 🛠️ STM32 Stand-Alone Mode
+No host application required. Just:
+- Open the STM32CubeIDE project.
+- Uncomment `inference();` inside the `while(1)` loop in `main.c` (or place it above the loop for minimal noise).
+- Flash the firmware to your STM32 board.
+- Use a serial monitor (like PuTTY, Tera Term, or STM32CubeIDE's built-in terminal) to view output on the selected COM port.
+
+This allows for direct, on-device anomaly detection using the hardcoded dataset in `inference_data.c`.
+
+---
+
+### 2. 💻 Qt Python Client (NanoEdge_Client.zip)
+An interactive COM port controller that allows:
+- Sending a single line of comma-separated float values manually.
+- Loading and batching input from `regular.csv` or `anomaly.csv`.
+- Receiving similarity scores and inference results in real-time.
+
+**Usage Notes:**
+- Make sure to select the correct **COM port number** and **baud rate** before starting.
+- Press **"Start"** to initialize communication *before* attempting to send.
+- Run `widget.py` using PySide6 and pyserial (install via `pip install PySide6 pyserial`).
+
+---
+
 
 License: GPL v.2
