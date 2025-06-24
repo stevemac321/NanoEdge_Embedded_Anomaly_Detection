@@ -77,5 +77,20 @@ Due to upload limitations on some platforms, the following files have been renam
 **To restore full STM32CubeIDE functionality, simply rename these files after cloning or downloading the repository.   NanoEdge AI Studio does support other boards, however this project has only been validated on the STM32H743Z. **
 
 ---
+COM Port Client–Controller Demo
+This package includes a compact demonstration of serial communication between a Python-based Qt client and an embedded STM32 controller running anomaly detection. The setup showcases:
+- Binary float transmission over UART (140 floats, 560 bytes total)
+- Real-time inference using NanoEdge AI Studio–generated models
+- A clean, testable Qt UI for sending data interactively or from file
+- Integration-friendly architecture with minimal dependencies
+This demo is ideal for developers exploring lightweight ML inference at the edge, or for those prototyping data-driven pipelines across a serial interface.
+To get started:
+- Open the .ui form in Qt Creator.
+- Launch widget.py with the required modules (PySide6, pyserial, etc.).
+- Flash the STM32 with the provided firmware.
+- Connect and test.
+  Compressed project archive: NanoEdge_with_Client.zip (no build artifacts included)
+
+
 
 License: GPL v.2
