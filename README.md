@@ -3,8 +3,10 @@
 
 > **Note**: This demo illustrates the full NanoEdge AI Studio pipeline—from model generation to embedded inference—using synthetic input data in place of live sensor readings. It is validated specifically on the STM32H743Z Nucleo-144 board using the NanoEdge library generated for this hardware. The anomaly detection logic is designed to showcase firmware-level integration and runtime evaluation, and results may vary due to the nature of test inputs.
 For real-world performance or sensor-based deployments, STMicroelectronics recommends their B-U585I-IOT02A Discovery Kit, which features onboard sensors and full NanoEdge compatibility.
-#UPDATE - I did include the signal data for NanoEdge AI Studio because, though far from having parity, the results with STM32F401RE board was decent.  The data is located in NanoEdge_Client/Signals.
-> The inferrence data is located in NanoEdge_Client/inferrence.
+
+**UPDATE** – Signal data for NanoEdge AI Studio is included in NanoEdge_Client/Signals, and inference outputs are located in NanoEdge_Client/inference. The STM32F401RE, while yielding decent results, was assigned a library with lower Quality Indicator (QI) and Behavioral Accuracy (BA) (~80%), which likely contributed to broader classification boundaries. In contrast, the STM32H7’s near-perfect QI produced a stricter inference model—flagging approximately 17% of F4-classified "normal" samples as anomalous.
+
+
 
 ---
 
