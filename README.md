@@ -3,7 +3,8 @@
 
 > **Note**: This demo illustrates the full NanoEdge AI Studio pipeline—from model generation to embedded inference—using synthetic input data in place of live sensor readings. It is validated specifically on the STM32H743Z Nucleo-144 board using the NanoEdge library generated for this hardware. The anomaly detection logic is designed to showcase firmware-level integration and runtime evaluation, and results may vary due to the nature of test inputs.
 For real-world performance or sensor-based deployments, STMicroelectronics recommends their B-U585I-IOT02A Discovery Kit, which features onboard sensors and full NanoEdge compatibility.
-
+#UPDATE - I did include the signal data for NanoEdge AI Studio because, though far from having parity, the results with STM32F401RE board was decent.  The data is located in NanoEdge_Client/Signals.
+> The inferrence data is located in NanoEdge_Client/inferrence.
 
 ---
 
@@ -109,10 +110,10 @@ This allows for direct, on-device anomaly detection using the hardcoded dataset 
 
 ---
 
-### 2. 💻 Qt Python Client (NanoEdge_Client.zip)
+### 2. 💻 Qt Python Client (NanoEdge_Client directory)
 An interactive COM port controller that allows:
 - Sending a single line of comma-separated float values manually.
-- Loading and batching input from `regular.csv` or `anomaly.csv`.
+- Loading and batching input from `regular.csv` or `anomaly.csv` in the NanoEdge_Client/inferrence directory.
 - Receiving similarity scores and inference results in real-time.
 
 **Usage Notes:**
