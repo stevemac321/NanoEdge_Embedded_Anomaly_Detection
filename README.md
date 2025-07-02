@@ -81,6 +81,7 @@ Due to upload limitations on some platforms, the following files have been renam
 
 ---
 COM Port Client–Controller Demo
+(to get this clone: https://github.com/stevemac321/NanoEdge_Client)
 This package includes a compact demonstration of serial communication between a Python-based Qt client and an embedded STM32 controller running anomaly detection. The setup showcases:
 - Binary float transmission over UART (140 floats, 560 bytes total)
 - Real-time inference using NanoEdge AI Studio–generated models
@@ -92,7 +93,7 @@ To get started:
 - Launch widget.py with the required modules (PySide6, pyserial, etc.).
 - Flash the STM32 with the provided firmware.
 - Connect and test.
-  Compressed project archive: NanoEdge_Client.zip (no build artifacts included)
+  
 
 
 ---
