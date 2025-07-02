@@ -1,8 +1,0 @@
-{
-    "files": [
-        "widget.py",
-        "form.ui",
-        "regular.csv",
-        "anomaly.csv"
-    ]
-}
